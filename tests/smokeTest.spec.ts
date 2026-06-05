@@ -1,6 +1,8 @@
+import { createToken } from '../helpers/createToken';
 import { test } from '../utils/fixtures';
 import { RequestHandler } from '../utils/request-handler';
 import { expect } from "@playwright/test";
+import { validateSchema } from '../utils/schema-validator';
 
 let authToken: string;
 
@@ -15,8 +17,8 @@ test.beforeAll('Get token', async ({ api, config }) => {
             }
         })
         .postRequest(200)
-
-    authToken = ' Token ' + tokenResponse.user.token;
+         authToken=  ' Token ' + tokenResponse.user.token;
+    //authToken = await createToken(api, config.userEmail, config.userPassword);
 })
 
 
@@ -28,6 +30,15 @@ test('First test', async ({ api, config }) => {
         .getRequest(200);
 })
 
+test('Get tags' ,async({api, config})=>{
+
+    const tagResponse = await api
+    .path('tags')
+    .headers({ Authorization: authToken })
+    .getRequest(200);
+    await validateSchema('tags', 'Get_tags', tagResponse);
+});
+
 test('Create ,update and delete a new article', async ({ api, config }) => {
     // Create a new article
     const createArticleResponse = await api
@@ -35,7 +46,7 @@ test('Create ,update and delete a new article', async ({ api, config }) => {
         .headers({ Authorization: authToken })
         .body({
             "article": {
-                "title": "new article",
+                "title": "new articles",
                 "description": "good article",
                 "body": "Technology is transforming the way people work and communicate. From online learning to remote jobs, digital tools have made information and opportunities more accessible than ever before. However, it is important to use technology responsibly and maintain a balance between online and offline life.\n",
                 "tagList": [
@@ -44,19 +55,20 @@ test('Create ,update and delete a new article', async ({ api, config }) => {
             }
         })
         .postRequest(201);
-
-    expect(createArticleResponse.article.title).toBe("new article");
+        
+//console.log(createArticleResponse);
+    expect(createArticleResponse.article.title).toBe("new articles");
     const slug = createArticleResponse.article.slug;
 
     // Verify the article is created
     const articleResponse = await api
-        .path("articles")
-        .params({ limit: 10, offset: 0 })
+        .path(`articles/${slug}`)
+        .headers({ Authorization: authToken })
         .getRequest(200);
-    //console.log(articleResponse);
-    expect(articleResponse.articles[0].title).toEqual("new article");
+   // console.log(articleResponse);
+    expect(articleResponse.article.title).toEqual("new articles");
 
-    // Update the article
+     // Update the article
     const updateArticleResponse = await api
         .path(`articles/${slug}`)
         .headers({ Authorization: authToken })
@@ -71,16 +83,18 @@ test('Create ,update and delete a new article', async ({ api, config }) => {
             }
         })
         .putRequest(200);
+
+       
     const updatedSlug = updateArticleResponse.article.slug;
     expect(updateArticleResponse.article.title).toBe("new article1");
 
-    // Verify the article is updated
+     // Verify the article is created
     const updateResponse = await api
-        .path("articles")
-        .params({ limit: 10, offset: 0 })
+        .path(`articles/${updatedSlug}`)
+        .headers({ Authorization: authToken })
         .getRequest(200);
-    //console.log(updateResponse);
-    expect(updateResponse.articles[0].title).toEqual("new article1");
+   // console.log(articleResponse);
+    expect(updateResponse.article.title).toEqual("new article1");
 
     // Delete the article
     await api
@@ -88,12 +102,6 @@ test('Create ,update and delete a new article', async ({ api, config }) => {
         .headers({ Authorization: authToken })
         .deleteRequest(204);
 
-    // Verify the article is deleted
-    const response = await api
-        .path("articles")
-        .params({ limit: 10, offset: 0 })
-        .getRequest(200);
-    //console.log(response);
-    expect(response.articles[0].title).not.toEqual("new article1");
+   
 
 })

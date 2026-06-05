@@ -1,4 +1,4 @@
-import { APIRequestContext } from "@playwright/test";
+import { APIRequestContext,test } from "@playwright/test";
 import { expect } from "@playwright/test";
 import { APILogger } from './logger';
 
@@ -40,60 +40,71 @@ export class RequestHandler {
         return this;
     }
     async getRequest(statusCode: number) {
+        let responseBody: any;
         const url = this.getUrl();
-        this.logger.logRequest('GET', url, this.apiHeaders);
+        console.log(`GET Request URL: ${url}`);
+        await test.step(`Sending GET request: ${url}`, async () => {
+            this.logger.logRequest('GET', url, this.apiHeaders);
         const response = await this.request.get(url, {
             headers: this.apiHeaders
 
         });
         this.reset();
         const actualStatus = response.status();
-        const responseBody = await response.json();
+         responseBody = await response.json();
+        // console.log("Get response body:", responseBody);
         this.logger.logResponse(actualStatus, responseBody);
         this.statusCodeValidator(actualStatus, statusCode, this.getRequest);
-
-
+        })
         return responseBody;
 
     }
 
     async postRequest(statusCode: number) {
+        let responseBody: any;
         const url = this.getUrl();
-        this.logger.logRequest('POST', url, this.apiHeaders, this.apiBody);
+
+        await test.step(`Sending POST request: ${url}`, async()=>{
+           this.logger.logRequest('POST', url, this.apiHeaders, this.apiBody);
         const response = await this.request.post(url, {
             headers: this.apiHeaders,
             data: this.apiBody
         });
         this.reset();
         const actualStatus = response.status();
-        const responseBody = await response.json();
+         responseBody = await response.json();
         this.logger.logResponse(actualStatus, responseBody);
         this.statusCodeValidator(actualStatus, statusCode, this.postRequest);
+        })
 
         return responseBody;
     }
 
     async putRequest(statusCode: number) {
+        let responseBody: any;
         const url = this.getUrl();
-        this.logger.logRequest('PUT', url, this.apiHeaders, this.apiBody);
+       await test.step(`sending PUT request: ${url}`, async()=>{
+             this.logger.logRequest('PUT', url, this.apiHeaders, this.apiBody);
         const response = await this.request.put(url, {
             headers: this.apiHeaders,
             data: this.apiBody
         });
         this.reset();
         const actualStatus = response.status();
-
-        const responseBody = await response.json();
-
+        responseBody = await response.json();
+        //console.log("update response body:", responseBody);
         this.logger.logResponse(actualStatus, responseBody);
         this.statusCodeValidator(actualStatus, statusCode, this.putRequest);
 
+        })
+       
         return responseBody;
 
     }
     async deleteRequest(statusCode: number) {
         const url = this.getUrl();
-        this.logger.logRequest('DELETE', url, this.apiHeaders);
+       await test.step(`sending DELETE request: ${url}`, async()=>{
+            this.logger.logRequest('DELETE', url, this.apiHeaders);
         const response = await this.request.delete(url, {
             headers: this.apiHeaders
         });
@@ -101,7 +112,8 @@ export class RequestHandler {
         const actualStatus = response.status();
         this.logger.logResponse(actualStatus, null);
         this.statusCodeValidator(actualStatus, statusCode, this.deleteRequest);
-
+        });
+    
 
     }
     private getUrl() {
