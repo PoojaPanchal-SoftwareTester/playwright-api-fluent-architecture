@@ -9,8 +9,11 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@faker-js/faker": "^10.4.0",
     "@playwright/test": "^1.60.0",
     "@types/node": "^25.9.1",
-    "ajv": "^8.20.0"
+    "ajv": "^8.20.0",
+    "genson-js": "^0.0.8",
+    "json-faker": "^1.1.2"
   }
 }
