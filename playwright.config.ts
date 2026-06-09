@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { chromium, defineConfig, devices } from '@playwright/test';
 
 /**
  * Read environment variables from file.
@@ -30,6 +30,7 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    headless: false,
     launchOptions: {
       slowMo: 1000, // Adjust the delay as needed (in milliseconds)
   }
@@ -38,9 +39,15 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'api-test',
+      testDir: './tests/api-test',
     },
+     {
+      name: 'ui-test',
+      testDir: './tests/ui-test',
+       use: { 
+        defaultBrowserType: "chromium"}
+    }
 
    /* {
       name: 'firefox',

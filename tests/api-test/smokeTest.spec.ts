@@ -1,14 +1,14 @@
-import { createToken } from '../helpers/createToken';
-import { test } from '../utils/fixtures';
-import { RequestHandler } from '../utils/request-handler';
+import { createToken } from '../../helpers/createToken';
+import { test } from '../../utils/fixtures';
+import { RequestHandler } from '../../utils/request-handler';
 import { expect } from "@playwright/test";
-import { validateSchema } from '../utils/schema-validator';
+import { validateSchema } from '../../utils/schema-validator';
 // import payload of request body from json file
-import ArticleRequestPayload from '../request-objects/Post-article.json';
+import ArticleRequestPayload from '../../request-objects/Post-article.json';
 import {faker} from '@faker-js/faker';
 
 //random data generate helper import
-import { getNewRandomArticle } from '../utils/data-generator';
+import { getNewRandomArticle } from '../../utils/data-generator';
 
 let authToken: string;
 

@@ -1,4 +1,4 @@
-import { test } from '../utils/fixtures';
+import { test } from '../../utils/fixtures';
 
 test("Error messgaes validation", async ({ api }) => {
 
